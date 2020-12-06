@@ -22,3 +22,13 @@ class MessageLengthError(Exception):
     """
 
     pass
+
+
+class NonPngImageError(Exception):
+    """
+    Error to indicate that specified output filename for Encoder.createCodeImage() or
+    input file for Decoder.decodeImage() is not a PNG, which is only accepted message
+    image filetype.
+    """
+
+    pass

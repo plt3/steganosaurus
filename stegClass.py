@@ -3,21 +3,32 @@ import os
 from PIL import Image
 
 from errors import (BinaryStringLengthError, MessageLengthError,
-                    NonAsciiCharacterError)
+                    NonAsciiCharacterError, NonPngImageError)
 from utils import getHeaderLength
 
 
 class Encoder:
 
-    """Docstring for Steganographer. """
+    """
+    Encoder class has createCodeImage method to hide message in image with specified
+    filename.
+    """
 
     def __init__(self, message):
-        """TODO: to be defined.
+        """Initialize Encoder object with given message and immediately converts it to
+        a binary string
 
-        :message: TODO
+        :message: any message made up of ASCII characters
 
         """
 
+        self.message = message
+        self.binaryMessage = Encoder.messageToBinary(message)
+
+    def getMessage(self):
+        return self.message
+
+    def setMessage(self, message):
         self.message = message
         self.binaryMessage = Encoder.messageToBinary(message)
 
@@ -43,7 +54,7 @@ class Encoder:
 
         return binaryMessage
 
-    def createCodeImage(self, filename):
+    def createCodeImage(self, filename, outputFile=""):
         """Create copy of image with hidden message inside.
 
         :filename: name of image to make a copy of with message
@@ -52,6 +63,13 @@ class Encoder:
         :raises MessageLengthError: if message is too long to be hidden in image
 
         """
+        if not outputFile:
+            noExt = os.path.splitext(filename)[0]
+            # have to save to .png file to avoid JPEG compression issues
+            outputFile = f"{noExt}_message.png"
+        elif os.path.splitext(outputFile)[1] != ".png":
+            raise NonPngImageError("outputFile must be a .png")
+
         img = Image.open(filename)
 
         headLength = getHeaderLength(img.width, img.height, img.mode)
@@ -83,22 +101,29 @@ class Encoder:
             newPixel.extend(oldPixel[len(newPixel) :])
             img.putpixel(coordTup, tuple(newPixel))
 
-        noExt = os.path.splitext(filename)[0]
-        # need to force image into PNG to avoid JPG compression
-        img.save(f"{noExt}_message.png")
+        img.save(outputFile)
 
 
 class Decoder:
 
-    """Docstring for Decoder. """
+    """
+    Decoder class has decodeImage method to return hidden message from image with
+    specified filename
+    """
 
     def __init__(self, filename):
-        """TODO: to be defined.
+        """Initialize Decoder object with given filename
 
-        :filename: TODO
+        :filename: path to/name of file with hidden image
 
         """
 
+        self.filename = filename
+
+    def getFilename(self):
+        return self.filename
+
+    def setFilename(self, filename):
         self.filename = filename
 
     @staticmethod
@@ -130,6 +155,9 @@ class Decoder:
         :returns: extracted message from image
 
         """
+        if os.path.splitext(self.filename)[1] != ".png":
+            raise NonPngImageError("Image to decode must be a .png")
+
         img = Image.open(self.filename)
 
         headLength = getHeaderLength(img.width, img.height, img.mode)
