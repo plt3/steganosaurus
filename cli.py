@@ -1,20 +1,16 @@
 import argparse
 
-from stegClass import Decoder, Encoder
-
-"""
-TODO:
-encode multiple files at once
-encode files read from a file
-some sort of dictionary (for like file-message pairs???)
-
-make a readme, with how to use it in python and how to use the cli
-"""
+from Steganography import Decoder, Encoder
 
 DESCRIPTION = "Python implementation of least significant bit steganography technique"
 
 
 def parserSetup():
+    """Create argparse.ArgumentParser object with correct arguments for CLI.
+
+    :returns: argparse.ArgumentParser instance with all arguments already set
+
+    """
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument(
         "filename", help="Path of file to encode message into/decode message from"
@@ -41,7 +37,6 @@ def parserSetup():
         "-o",
         "--outputfile",
         help="File path to save encoded image to or to write decoded message to",
-        # default="default",
     )
     parser.add_argument(
         "-i",
@@ -53,6 +48,10 @@ def parserSetup():
 
 
 def main():
+    """Get argparse.ArgumentParser instance and execute correct actions based on
+    command line arguments.
+
+    """
     cliParser = parserSetup()
     args = cliParser.parse_args()
 
