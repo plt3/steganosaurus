@@ -54,12 +54,13 @@ class Encoder:
 
         return binaryMessage
 
-    def createCodeImage(self, filename, outputFile=""):
+    def createCodeImage(self, filename, outputFile=None):
         """Create copy of image with hidden message inside.
 
         :filename: name of image to make a copy of with message
         :message: message to hide into the image
-        :returns: None
+        :outputFile: path of file to save encoded image to
+        :returns: filepath of newly created image
         :raises MessageLengthError: if message is too long to be hidden in image
 
         """
@@ -102,6 +103,8 @@ class Encoder:
             img.putpixel(coordTup, tuple(newPixel))
 
         img.save(outputFile)
+
+        return outputFile
 
 
 class Decoder:
